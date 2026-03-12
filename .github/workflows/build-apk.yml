@@ -23,18 +23,16 @@ jobs:
         cache: gradle
         
     - name: Grant execute permission for gradlew
-      run: chmod +x PocketDev/gradlew
-      working-directory: .
+      run: chmod +x gradlew
       
     - name: Build Debug APK
       run: ./gradlew assembleDebug
-      working-directory: PocketDev
       
     - name: Upload Debug APK Artifact
       uses: actions/upload-artifact@v4
       with:
         name: pocketdev-debug-apk
-        path: PocketDev/app/build/outputs/apk/debug/*.apk
+        path: app/build/outputs/apk/debug/*.apk
         retention-days: 30
         
     - name: Create Release (on main branch only)
@@ -48,7 +46,7 @@ jobs:
         name: PocketDev v${{ github.run_number }}
         draft: false
         prerelease: false
-        files: PocketDev/app/build/outputs/apk/debug/*.apk
+        files: app/build/outputs/apk/debug/*.apk
         body: |
           ## PocketDev - Native Android Coding Workspace
           
