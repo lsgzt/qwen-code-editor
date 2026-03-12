@@ -1,0 +1,78 @@
+name: Build and Release APK
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: gradle
+        
+    - name: Grant execute permission for gradlew
+      run: chmod +x PocketDev/gradlew
+      working-directory: .
+      
+    - name: Build Debug APK
+      run: ./gradlew assembleDebug
+      working-directory: PocketDev
+      
+    - name: Upload Debug APK Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: pocketdev-debug-apk
+        path: PocketDev/app/build/outputs/apk/debug/*.apk
+        retention-days: 30
+        
+    - name: Create Release (on main branch only)
+      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+      id: create_release
+      uses: softprops/action-gh-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ github.run_number }}
+        name: PocketDev v${{ github.run_number }}
+        draft: false
+        prerelease: false
+        files: PocketDev/app/build/outputs/apk/debug/*.apk
+        body: |
+          ## PocketDev - Native Android Coding Workspace
+          
+          ### What's New
+          Automated build from commit ${{ github.sha }}
+          
+          ### Features
+          - 🐍 Python execution (Chaquopy)
+          - 🌐 JavaScript execution (Rhino)
+          - 📄 HTML rendering (WebView)
+          - ✨ Syntax highlighting for 8 languages
+          - 🤖 AI-powered code assistance (Groq API)
+          - 📚 Built-in learning examples
+          - 💾 Project management
+          
+          ### Installation
+          1. Download the APK file below
+          2. Enable "Install from Unknown Sources" on your Android device
+          3. Install and enjoy!
+          
+          ### Setup
+          - Open the app
+          - Go to Settings
+          - Enter your Groq API key (get one free at https://console.groq.com)
+          
+          ---
+          Built with ❤️ for student developers
