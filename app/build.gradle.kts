@@ -5,12 +5,8 @@ plugins {
     kotlin("kapt")
 }
 
-// Conditionally apply Chaquopy only for local builds
+// Check if we're in CI (GitHub Actions)
 val isCI = System.getenv("GITHUB_ACTIONS").toBoolean()
-val pythonExists = java.io.File("/usr/bin/python3").exists()
-if (!isCI && pythonExists) {
-    apply(plugin = "com.chaquo.python")
-}
 
 android {
     namespace = "com.pocketdev"
@@ -25,10 +21,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        // Chaquopy Python config - only for local builds with Python installed
-        if (!isCI && pythonExists) {
-            configureChaquopy()
-        }
+        // Chaquopy Python config - skip in CI, will be configured via plugin block below
     }
 
     buildTypes {
@@ -65,6 +58,18 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+}
+
+// Apply Chaquopy plugin conditionally - only when Python is available
+if (!isCI && java.io.File("/usr/bin/python3").exists()) {
+    apply(plugin = "com.chaquo.python")
+    configure<com.chaquo.python.gradle.PluginExtension> {
+        defaultConfig {
+            python {
+                version = "3.8"
+            }
         }
     }
 }
