@@ -2,7 +2,6 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.devtools.ksp")
-    id("com.chaquo.python")
     kotlin("kapt")
 }
 
@@ -19,8 +18,10 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        // Chaquopy Python config - skip in GitHub Actions CI
-        if (!System.getenv("GITHUB_ACTIONS").toBoolean()) {
+        // Chaquopy Python config - only for local builds with Python installed
+        // Disabled in CI environments
+        if (!System.getenv("GITHUB_ACTIONS").toBoolean() && java.io.File("/usr/bin/python3").exists()) {
+            apply(plugin = "com.chaquo.python")
             chaquopy {
                 defaultConfig {
                     version = "3.8"
