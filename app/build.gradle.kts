@@ -19,11 +19,13 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        // Chaquopy Python config
-        chaquopy {
-            defaultConfig {
-                version = "3.8"
-                buildPython("/usr/bin/python3")
+        // Chaquopy Python config - skip in GitHub Actions CI
+        if (!System.getenv("GITHUB_ACTIONS").toBoolean()) {
+            chaquopy {
+                defaultConfig {
+                    version = "3.8"
+                    buildPython("/usr/bin/python3")
+                }
             }
         }
     }
