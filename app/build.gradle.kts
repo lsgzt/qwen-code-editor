@@ -64,16 +64,16 @@ android {
 
 // Apply Chaquopy plugin conditionally - only when Python is available (local builds)
 // For CI builds, we skip Python execution but still compile the app
-if (!isCI && java.io.File("/usr/bin/python3").exists()) {
+if (!isCI) {
     apply(plugin = "com.chaquo.python")
-    configure(com.chaquo.python.gradle.PythonPluginExtension::class.java) {
+    configure<com.chaquo.python.gradle.PythonPluginExtension> {
         defaultConfig {
             python {
                 version = "3.8"
             }
         }
     }
-} else if (isCI) {
+} else {
     // CI build - skip Chaquopy configuration
     println("CI build detected - skipping Chaquopy configuration for APK build")
 }
