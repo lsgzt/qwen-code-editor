@@ -62,15 +62,16 @@ android {
     }
 }
 
-// Apply Chaquopy plugin conditionally - only when Python is available (local builds)
-// For CI builds, we skip Python execution but still compile the app
+// Apply Chaquopy plugin conditionally - only for local builds
+// For CI builds, we skip Python configuration entirely
 if (!isCI) {
     apply(plugin = "com.chaquo.python")
-    configure<com.chaquo.python.gradle.PythonPluginExtension> {
-        defaultConfig {
-            python {
-                version = "3.8"
-            }
+    // Use string-based configuration to avoid compile-time dependency
+    project.extensions.configure("python", groovy.lang.Closure.DELEGATE_ONLY) {
+        it -> 
+        val defaultConfig = it.defaultConfig
+        defaultConfig.python {
+            it.version = "3.8"
         }
     }
 } else {
