@@ -62,21 +62,10 @@ android {
     }
 }
 
-// Apply Chaquopy plugin conditionally - only for local builds
-// For CI builds, we skip Python configuration entirely
+// Apply Chaquopy plugin only for local builds
+// For CI builds, we skip Python configuration entirely to allow APK build without Python
 if (!isCI) {
     apply(plugin = "com.chaquo.python")
-    // Use string-based configuration to avoid compile-time dependency
-    project.extensions.configure("python", groovy.lang.Closure.DELEGATE_ONLY) {
-        it -> 
-        val defaultConfig = it.defaultConfig
-        defaultConfig.python {
-            it.version = "3.8"
-        }
-    }
-} else {
-    // CI build - skip Chaquopy configuration
-    println("CI build detected - skipping Chaquopy configuration for APK build")
 }
 
 dependencies {
